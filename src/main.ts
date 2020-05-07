@@ -1,9 +1,9 @@
-import * as core from '@actions/core';
+import { getInput, setFailed } from '@actions/core';
 
 const s3 = require('s3');
 
 const REQUIRED = { required: true };
-const getRequiredInput = input => core.getInput(input, REQUIRED);
+const getRequiredInput = input => getInput(input, REQUIRED);
 
 interface InputParameters {
   awsAccessKeyId: string;
@@ -28,7 +28,7 @@ const getInputParameters = (): InputParameters => ({
   awsSecretAccessKey: getRequiredInput('AWS_BUCKET_NAME'),
   awsRegion: getRequiredInput('AWS_REGION'),
   source: getRequiredInput('SOURCE'),
-  withDelete: toBoolean(core.getInput('WITH_DELETE'), false),
+  withDelete: toBoolean(getInput('WITH_DELETE'), false),
   target: getRequiredInput('TARGET')
 });
 
@@ -65,7 +65,7 @@ async function run(): Promise<void> {
     const inputParameters = getInputParameters();
     await syncFolder(inputParameters);
   } catch (error) {
-    core.setFailed(error.message);
+    setFailed(error.message);
   }
 }
 
