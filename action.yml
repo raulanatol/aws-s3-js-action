@@ -49,14 +49,3 @@ inputs:
 runs:
   using: 'node12'
   main: 'dist/index.js'
-  args:
-    - ${{ inputs.AWS_ACCESS_KEY_ID }}
-    - ${{ inputs.AWS_SECRET_ACCESS_KEY }}
-    - ${{ inputs.AWS_REGION }}
-    - ${{ inputs.AWS_BUCKET_NAME }}
-    - ${{ inputs.SOURCE }}
-    - ${{ inputs.TARGET }}
-    - ${{ inputs.WITH_DELETE }}
-    - ${{ inputs.WITH_CLOUD_FRONT_INVALIDATION }}
-    - ${{ inputs.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
-    - ${{ inputs.AWS_CLOUDFRONT_INVALIDATION_PATH }}
