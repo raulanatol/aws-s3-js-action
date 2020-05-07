@@ -3,7 +3,7 @@ import { getInput, setFailed } from '@actions/core';
 const s3 = require('s3');
 
 const REQUIRED = { required: true };
-const getRequiredInput = input => getInput(input, REQUIRED);
+const getRequiredInput = (input) => getInput(input, REQUIRED);
 
 interface InputParameters {
   awsAccessKeyId: string;
@@ -32,7 +32,11 @@ const getInputParameters = (): InputParameters => ({
   target: getRequiredInput('TARGET')
 });
 
-const getS3Client = ({ awsAccessKeyId, awsSecretAccessKey, awsRegion }: InputParameters) => {
+const getS3Client = ({
+                       awsAccessKeyId,
+                       awsSecretAccessKey,
+                       awsRegion
+                     }: InputParameters) => {
   return s3.createClient({
     s3Options: {
       accessKeyId: awsAccessKeyId,
@@ -42,7 +46,8 @@ const getS3Client = ({ awsAccessKeyId, awsSecretAccessKey, awsRegion }: InputPar
   });
 };
 
-const printProgress = ({ progressAmount, progressTotal }) => console.log('Progress:', progressAmount, progressTotal);
+const printProgress = ({ progressAmount, progressTotal }) =>
+  console.log('Progress:', progressAmount, progressTotal);
 
 const syncFolder = (inputParameters: InputParameters) => {
   const { source, withDelete, awsBucketName, target } = inputParameters;
@@ -54,7 +59,7 @@ const syncFolder = (inputParameters: InputParameters) => {
       deleteRemoved: withDelete,
       s3Params: { Bucket: awsBucketName, Prefix: target }
     });
-    uploader.on('error', err => reject(err));
+    uploader.on('error', (err) => reject(err));
     uploader.on('progress', () => printProgress(uploader));
     uploader.on('end', () => resolve());
   });
