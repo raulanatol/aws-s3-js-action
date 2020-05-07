@@ -1,0 +1,62 @@
+name: AWS S3 bucket synchronization (JS)
+description: Synchronize S3 bucket files
+author: raulanatol
+branding:
+  color: green
+  icon: upload-cloud
+inputs:
+  AWS_ACCESS_KEY_ID:
+    description: AWS ACCESS KEY
+    required: true
+
+  AWS_SECRET_ACCESS_KEY:
+    description: AWS SECRET KEY
+    required: true
+
+  AWS_REGION:
+    description: AWS REGION
+    required: true
+    default: us-west-2
+
+  AWS_BUCKET_NAME:
+    description: Name of the bucket
+    required: true
+
+  SOURCE:
+    description: Source of copying
+    required: true
+
+  TARGET:
+    description: Target in the AWS S3
+    required: true
+
+  WITH_DELETE:
+    description: If defined the s3 sync is executed with the --delete flag
+    required: false
+
+  WITH_CLOUD_FRONT_INVALIDATION:
+    description: If defined a cloudfront invalidation will be executed
+    required: false
+
+  AWS_CLOUDFRONT_DISTRIBUTION_ID:
+    description: Id of the cloudfront distribution
+    required: false
+
+  AWS_CLOUDFRONT_INVALIDATION_PATH:
+    description: Path for the cloudfront invalidation
+    required: false
+
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
+  args:
+    - ${{ inputs.AWS_ACCESS_KEY_ID }}
+    - ${{ inputs.AWS_SECRET_ACCESS_KEY }}
+    - ${{ inputs.AWS_REGION }}
+    - ${{ inputs.AWS_BUCKET_NAME }}
+    - ${{ inputs.SOURCE }}
+    - ${{ inputs.TARGET }}
+    - ${{ inputs.WITH_DELETE }}
+    - ${{ inputs.WITH_CLOUD_FRONT_INVALIDATION }}
+    - ${{ inputs.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
+    - ${{ inputs.AWS_CLOUDFRONT_INVALIDATION_PATH }}
