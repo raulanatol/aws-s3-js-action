@@ -36,10 +36,6 @@ function verify_uncommitted_changes() {
   fi
 }
 
-function publish() {
-  npm publish --access public
-}
-
 function git_push() {
   git push && git push --tags
 }
@@ -47,5 +43,4 @@ function git_push() {
 verify_uncommitted_changes
 verify_master_branch
 new_version
-publish
 git_push
