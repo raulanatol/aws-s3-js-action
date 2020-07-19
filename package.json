@@ -1,6 +1,6 @@
 {
   "name": "aws-s3-js-action",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "private": true,
   "description": "Synchronize S3 bucket files",
   "main": "lib/main.js",
