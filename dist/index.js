@@ -19,7 +19,13 @@ module.exports =
 /******/ 		};
 /******/
 /******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 		var threw = true;
+/******/ 		try {
+/******/ 			modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 			threw = false;
+/******/ 		} finally {
+/******/ 			if(threw) delete installedModules[moduleId];
+/******/ 		}
 /******/
 /******/ 		// Flag the module as loaded
 /******/ 		module.l = true;
@@ -2944,7 +2950,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = __webpack_require__(470);
 const s3 = __webpack_require__(478);
 const REQUIRED = { required: true };
-const getRequiredInput = input => core_1.getInput(input, REQUIRED);
+const getRequiredInput = (input) => core_1.getInput(input, REQUIRED);
 const toBoolean = (input, defaultValue = false) => {
     if (!input) {
         return defaultValue;
@@ -2979,7 +2985,7 @@ const syncFolder = (inputParameters) => {
             deleteRemoved: withDelete,
             s3Params: { Bucket: awsBucketName, Prefix: target }
         });
-        uploader.on('error', err => reject(err));
+        uploader.on('error', (err) => reject(err));
         uploader.on('progress', () => printProgress(uploader));
         uploader.on('end', () => resolve());
     });
