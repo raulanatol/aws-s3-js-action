@@ -1,6 +1,8 @@
 import { getInput, setFailed } from '@actions/core';
-
-const s3 = require('s3');
+import { S3 } from 'aws-sdk';
+import recursive from 'recursive-readdir';
+import { readFile } from 'fs';
+import { join } from 'path';
 
 const REQUIRED = { required: true };
 const getRequiredInput = (input) => getInput(input, REQUIRED);
@@ -24,8 +26,8 @@ const toBoolean = (input: string, defaultValue: boolean = false): boolean => {
 
 const getInputParameters = (): InputParameters => ({
   awsAccessKeyId: getRequiredInput('AWS_ACCESS_KEY_ID'),
-  awsBucketName: getRequiredInput('AWS_SECRET_ACCESS_KEY'),
-  awsSecretAccessKey: getRequiredInput('AWS_BUCKET_NAME'),
+  awsSecretAccessKey: getRequiredInput('AWS_SECRET_ACCESS_KEY'),
+  awsBucketName: getRequiredInput('AWS_BUCKET_NAME'),
   awsRegion: getRequiredInput('AWS_REGION'),
   source: getRequiredInput('SOURCE'),
   withDelete: toBoolean(getInput('WITH_DELETE'), false),
@@ -37,31 +39,74 @@ const getS3Client = ({
                        awsSecretAccessKey,
                        awsRegion
                      }: InputParameters) => {
-  return s3.createClient({
-    s3Options: {
-      accessKeyId: awsAccessKeyId,
-      secretAccessKey: awsSecretAccessKey,
-      region: awsRegion
-    }
+  return new S3({
+    accessKeyId: awsAccessKeyId,
+    secretAccessKey: awsSecretAccessKey,
+    region: awsRegion
   });
 };
 
-const printProgress = ({ progressAmount, progressTotal }) =>
-  console.log('Progress:', progressAmount, progressTotal);
+const s3ListObjects = (s3Client, bucket, folder): Promise<any[]> => {
+  return new Promise((resolve, reject) => {
+    s3Client.listObjectsV2({ Bucket: bucket, Prefix: folder }, (err, data) => {
+      err ? reject(err) : resolve(data.Contents);
+    });
+  });
+};
 
-const syncFolder = (inputParameters: InputParameters) => {
+const emptyS3Folder = async (awsBucketName: string, target: string, s3Client: S3) => {
+  const objectsToRemove = await s3ListObjects(s3Client, awsBucketName, target);
+  if (!objectsToRemove.length) {
+    return;
+  }
+
+  const keysToRemove = objectsToRemove.map(object => ({ Key: object.Key }));
+
+  const deleteParams = {
+    Bucket: awsBucketName,
+    Delete: { Objects: keysToRemove }
+  };
+
+  await s3Client.deleteObjects(deleteParams).promise();
+  console.log('Deleted', keysToRemove.length, 'files');
+};
+
+const syncFolder = async (inputParameters: InputParameters) => {
   const { source, withDelete, awsBucketName, target } = inputParameters;
+  const s3Client = getS3Client(inputParameters);
+
+  if (withDelete) {
+    await emptyS3Folder(awsBucketName, target, s3Client);
+  }
 
   return new Promise((resolve, reject) => {
-    const uploader = getS3Client(inputParameters);
-    uploader.uploadDir({
-      localDir: source,
-      deleteRemoved: withDelete,
-      s3Params: { Bucket: awsBucketName, Prefix: target }
-    });
-    uploader.on('error', (err) => reject(err));
-    uploader.on('progress', () => printProgress(uploader));
-    uploader.on('end', () => resolve());
+    recursive(source, ((err, files: string[] = []) => {
+      if (!files.length) {
+        reject({ message: 'No files to sync' });
+        return;
+      }
+
+      const removeBasePath = new RegExp(source);
+      for (const filePath of files) {
+        console.log(filePath);
+        readFile(filePath, (error, fileContent) => {
+          if (error) {
+            throw error;
+          }
+
+          const filename = filePath.replace(removeBasePath, '');
+          const key = join(target, filename);
+          s3Client.putObject({
+            Bucket: awsBucketName,
+            Key: key,
+            Body: fileContent
+          }, () => {
+            console.log(`Successfully uploaded '${filename}' to ${key}!`);
+          });
+        });
+      }
+      resolve();
+    }));
   });
 };
 
@@ -69,6 +114,7 @@ async function run(): Promise<void> {
   try {
     const inputParameters = getInputParameters();
     await syncFolder(inputParameters);
+    // TODO invalidate cloudfront
   } catch (error) {
     setFailed(error.message);
   }
