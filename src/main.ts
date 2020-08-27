@@ -29,20 +29,20 @@ const getInputParameters = (): InputParameters => ({
   awsRegion: getRequiredInput('AWS_REGION'),
   source: getRequiredInput('SOURCE'),
   withDelete: toBoolean(getInput('WITH_DELETE'), false),
-  target: getRequiredInput('TARGET'),
+  target: getRequiredInput('TARGET')
 });
 
 const getS3Client = ({
-  awsAccessKeyId,
-  awsSecretAccessKey,
-  awsRegion,
-}: InputParameters) => {
+                       awsAccessKeyId,
+                       awsSecretAccessKey,
+                       awsRegion
+                     }: InputParameters) => {
   return s3.createClient({
     s3Options: {
       accessKeyId: awsAccessKeyId,
       secretAccessKey: awsSecretAccessKey,
-      region: awsRegion,
-    },
+      region: awsRegion
+    }
   });
 };
 
@@ -57,7 +57,7 @@ const syncFolder = (inputParameters: InputParameters) => {
     uploader.uploadDir({
       localDir: source,
       deleteRemoved: withDelete,
-      s3Params: { Bucket: awsBucketName, Prefix: target },
+      s3Params: { Bucket: awsBucketName, Prefix: target }
     });
     uploader.on('error', (err) => reject(err));
     uploader.on('progress', () => printProgress(uploader));
@@ -74,4 +74,4 @@ async function run(): Promise<void> {
   }
 }
 
-run();
+run().catch(console.error);
