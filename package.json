@@ -26,7 +26,8 @@
   },
   "dependencies": {
     "@actions/core": "^1.2.5",
-    "s3": "^4.4.0"
+    "aws-sdk": "^2.740.0",
+    "recursive-readdir": "^2.2.2"
   },
   "devDependencies": {
     "@types/jest": "^26.0.10",
@@ -36,10 +37,11 @@
     "eslint": "^7.7.0",
     "eslint-plugin-github": "^4.1.1",
     "eslint-plugin-jest": "^23.20.0",
+    "graceful-fs": "^4.2.4",
     "jest": "^26.4.2",
     "jest-circus": "^26.4.2",
     "js-yaml": "^3.14.0",
-    "mime": ">=1.4.1",
+    "mime": ">=2.4.6",
     "prettier": "^2.1.1",
     "ts-jest": "^26.3.0",
     "typescript": "^4.0.2"
