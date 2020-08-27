@@ -1,5 +1,5 @@
 import { getInput, setFailed } from '@actions/core';
-import { S3 } from 'aws-sdk';
+import { CloudFront, S3 } from 'aws-sdk';
 import recursive from 'recursive-readdir';
 import { readFile } from 'fs';
 import { join } from 'path';
@@ -15,6 +15,9 @@ interface InputParameters {
   withDelete: boolean;
   target: string;
   source: string;
+  withCloudfrontInvalidation: boolean;
+  cloudFrontDistributionId: string;
+  cloudFrontInvalidationPath: string;
 }
 
 const toBoolean = (input: string, defaultValue: boolean = false): boolean => {
@@ -31,7 +34,10 @@ const getInputParameters = (): InputParameters => ({
   awsRegion: getRequiredInput('AWS_REGION'),
   source: getRequiredInput('SOURCE'),
   withDelete: toBoolean(getInput('WITH_DELETE'), false),
-  target: getRequiredInput('TARGET')
+  target: getRequiredInput('TARGET'),
+  withCloudfrontInvalidation: toBoolean(getInput('WITH_CLOUDFRONT_INVALIDATION'), false),
+  cloudFrontDistributionId: getInput('AWS_CLOUDFRONT_DISTRIBUTION_ID'),
+  cloudFrontInvalidationPath: getInput('AWS_CLOUDFRONT_INVALIDATION_PATH')
 });
 
 const getS3Client = ({
@@ -40,6 +46,18 @@ const getS3Client = ({
                        awsRegion
                      }: InputParameters) => {
   return new S3({
+    accessKeyId: awsAccessKeyId,
+    secretAccessKey: awsSecretAccessKey,
+    region: awsRegion
+  });
+};
+
+const getCloudFrontClient = ({
+                               awsAccessKeyId,
+                               awsSecretAccessKey,
+                               awsRegion
+                             }: InputParameters) => {
+  return new CloudFront({
     accessKeyId: awsAccessKeyId,
     secretAccessKey: awsSecretAccessKey,
     region: awsRegion
@@ -110,11 +128,36 @@ const syncFolder = async (inputParameters: InputParameters) => {
   });
 };
 
+async function invalidateCache(inputParameters: InputParameters) {
+  if (!inputParameters.cloudFrontDistributionId || !inputParameters.cloudFrontInvalidationPath) {
+    throw new Error('Need AWS_CLOUDFRONT_DISTRIBUTION_ID and AWS_CLOUDFRONT_INVALIDATION_PATH to perform the invalidation');
+  }
+  const cloudfrontClient = getCloudFrontClient(inputParameters);
+  return new Promise((resolve, reject) => {
+    cloudfrontClient.createInvalidation({
+      DistributionId: inputParameters.cloudFrontDistributionId,
+      InvalidationBatch: {
+        CallerReference: `Action-${new Date().getTime()}`,
+        Paths: {
+          Quantity: 1,
+          Items: [
+            inputParameters.cloudFrontInvalidationPath
+          ]
+        }
+      }
+    }, (err) => {
+      err ? reject(err) : resolve('Invalidation done');
+    });
+  });
+}
+
 async function run(): Promise<void> {
   try {
     const inputParameters = getInputParameters();
     await syncFolder(inputParameters);
-    // TODO invalidate cloudfront
+    if (inputParameters.withCloudfrontInvalidation) {
+      await invalidateCache(inputParameters);
+    }
   } catch (error) {
     setFailed(error.message);
   }
