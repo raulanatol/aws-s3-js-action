@@ -4,6 +4,8 @@ This action using the [AWS-SDK for JavaScript in Node.js](https://aws.amazon.com
 
 Is the same as [aws-s3-docker-action](https://github.com/raulanatol/aws-s3-docker-action) because sometimes is not possible to use a docker container in your actions jobs.
 
+`Container action is only supported on Linux`
+
 ![Container action is only supported on Linux](docs/container-error.png)
 
 ## Inputs
