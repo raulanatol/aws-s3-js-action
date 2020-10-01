@@ -25,7 +25,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@actions/core": "^1.2.5",
+    "@actions/core": "^1.2.6",
     "aws-sdk": "^2.740.0",
     "recursive-readdir": "^2.2.2"
   },
