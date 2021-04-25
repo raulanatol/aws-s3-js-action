@@ -41,10 +41,10 @@ const getInputParameters = (): InputParameters => ({
 });
 
 const getS3Client = ({
-                       awsAccessKeyId,
-                       awsSecretAccessKey,
-                       awsRegion
-                     }: InputParameters) => {
+  awsAccessKeyId,
+  awsSecretAccessKey,
+  awsRegion
+}: InputParameters) => {
   return new S3({
     accessKeyId: awsAccessKeyId,
     secretAccessKey: awsSecretAccessKey,
@@ -53,10 +53,10 @@ const getS3Client = ({
 };
 
 const getCloudFrontClient = ({
-                               awsAccessKeyId,
-                               awsSecretAccessKey,
-                               awsRegion
-                             }: InputParameters) => {
+  awsAccessKeyId,
+  awsSecretAccessKey,
+  awsRegion
+}: InputParameters) => {
   return new CloudFront({
     accessKeyId: awsAccessKeyId,
     secretAccessKey: awsSecretAccessKey,
@@ -123,7 +123,7 @@ const syncFolder = async (inputParameters: InputParameters) => {
           });
         });
       }
-      resolve();
+      resolve(true);
     }));
   });
 };

@@ -11,36 +11,34 @@ if [[ $# != 1 ]]; then
   error "Please specify npm version parameter (major, minor, patch)"
 fi
 
-yarn test
-yarn lint
-yarn build
-
 VERSION_PARAM=$1
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-function new_version() {
+function change_version() {
   npm version "${VERSION_PARAM}"
 }
 
-function verify_master_branch() {
-  if [[ ${BRANCH} == 'master' ]]; then
-    echo "Master branch"
-  else
+function verify_main_branch() {
+  if [[ ${BRANCH} != 'main' ]]; then
     error "Invalid branch name ${BRANCH}"
   fi
 }
 
 function verify_uncommitted_changes() {
   if [[ $(git status --porcelain) ]]; then
+    git status
     error "There are uncommitted changes in the working tree."
   fi
 }
 
-function git_push() {
-  git push && git push --tags
+function publish() {
+  npm publish --access public
+  git push && git push --follow-tags
 }
 
 verify_uncommitted_changes
-verify_master_branch
-new_version
-git_push
+verify_main_branch
+change_version
+make
+publish
+echo "📦✅"
