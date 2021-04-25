@@ -1,29 +1,5 @@
 {
-  "plugins": [
-    "jest",
-    "@typescript-eslint"
-  ],
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "ecmaVersion": 9,
-    "sourceType": "module",
-    "project": "./tsconfig.json"
-  },
-  "rules": {
-    "no-unused-vars": "error",
-    "no-multiple-empty-lines": "error",
-    "curly": [
-      2,
-      "all"
-    ],
-    "comma-dangle": "off",
-    "@typescript-eslint/no-angle-bracket-type-assertion": "off",
-    "getter-return": "off",
-    "no-console": "off"
-  },
-  "env": {
-    "node": true,
-    "es6": true,
-    "jest/globals": true
-  }
+  "extends": [
+    "@cowcoders/eslint-config/ts"
+  ]
 }
