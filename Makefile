@@ -2,23 +2,23 @@
 
 init:
 	@echo "Initialising the project"
-	@yarn
+	@npm install
 
 test:
 	@echo "Testing..."
-	@yarn test
+	@npm run test
 
 build:
 	@echo "👩‍🏭 Building..."
-	@yarn build
-	@yarn package
+	@npm run build
+	@npm run package
 
 check: --pre_check test build
 	@echo "✅"
 
 clean:
 	@echo "🛁 Cleaning..."
-	@yarn clean
+	@npm run clean
 
 clean_all: clean
 	@echo "🧨 Clean all"
@@ -36,7 +36,7 @@ release: check
 	@.scripts/finish-release patch
 
 --pre_check:
-	@yarn run clean
-	@yarn
-	@yarn run lint
-	@yarn run type-check
+	@npm run clean
+	@npm install
+	@npm run lint
+	@npm run type-check
