@@ -43,7 +43,7 @@ jobs:
 
       - name: Sync to S3
         uses: raulanatol/aws-s3-js-action@main
-        env:
+        with:
           AWS_ACCESS_KEY_ID:
           AWS_SECRET_ACCESS_KEY:
           AWS_REGION: 
