@@ -24,7 +24,7 @@
     "type-check": "tsc --pretty --noEmit"
   },
   "dependencies": {
-    "@actions/core": "1.2.7",
+    "@actions/core": "1.9.1",
     "aws-sdk": "2.892.0",
     "recursive-readdir": "2.2.2"
   },
