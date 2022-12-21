@@ -26,7 +26,7 @@
   "dependencies": {
     "@actions/core": "^1.9.1",
     "aws-sdk": "2.892.0",
-    "recursive-readdir": "2.2.2"
+    "recursive-readdir": "2.2.3"
   },
   "devDependencies": {
     "@cowcoders/eslint-config": "1.2.9",
