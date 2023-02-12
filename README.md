@@ -34,13 +34,12 @@ Create the file `workflow.yml` in `.github/workflows` folder.
 
 ```
 name: S3 Sync
-on [push]
-
+on: [push]
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v3
 
       - name: Sync to S3
         uses: raulanatol/aws-s3-js-action@v1.0.0
