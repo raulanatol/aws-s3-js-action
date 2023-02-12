@@ -128,7 +128,7 @@ const syncFolder = async (inputParameters: InputParameters) => {
   });
 };
 
-async function invalidateCache(inputParameters: InputParameters) {
+const invalidateCache = (inputParameters: InputParameters) => {
   if (!inputParameters.cloudFrontDistributionId || !inputParameters.cloudFrontInvalidationPath) {
     throw new Error('Need AWS_CLOUDFRONT_DISTRIBUTION_ID and AWS_CLOUDFRONT_INVALIDATION_PATH to perform the invalidation');
   }
@@ -149,7 +149,7 @@ async function invalidateCache(inputParameters: InputParameters) {
       err ? reject(err) : resolve('Invalidation done');
     });
   });
-}
+};
 
 async function run(): Promise<void> {
   try {
@@ -158,7 +158,7 @@ async function run(): Promise<void> {
     if (inputParameters.withCloudfrontInvalidation) {
       await invalidateCache(inputParameters);
     }
-  } catch (error) {
+  } catch (error: any) {
     setFailed(error.message);
   }
 }
